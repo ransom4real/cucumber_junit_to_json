@@ -1,0 +1,34 @@
+AllCops:
+  TargetRubyVersion: 2.4
+  Exclude:
+    - Gemfile
+    - bin/*
+Style/ClassAndModuleChildren:
+  Enabled: false
+Metrics/LineLength:
+  Enabled: false
+Metrics/ClassLength:
+  Max: 170
+Performance/RegexpMatch:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Max: 20
+MethodLength:
+  Max: 50
+Metrics/ParameterLists:
+  Max: 10
+Metrics/AbcSize:
+  Enabled: false
+Naming/PredicateName:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Max: 10
+Security/Eval:
+  Enabled: false
+Metrics/BlockLength:
+  Max: 50
+  Exclude:
+    - rake/**/*.rake
+    - cucumber_junit_to_json.gemspec
+Naming/VariableName:
+  Enabled: false

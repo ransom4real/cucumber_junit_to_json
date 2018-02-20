@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/cucumber_junit_to_json/app'
+
+exit CucumberJunitToJson::App.new.run(*ARGV)
