@@ -79,6 +79,14 @@ module CucumberJunitToJson
       scenarios = []
       testcases.each do |testcase|
         scenario = CucumberJunitToJson::Models::Scenario.new
+        failing_step = nil
+        failure_message = nil
+        if testcase['status'] == 'failed'
+          failure = testcase.css('failure')
+          failure_info = failure.text.split(failure.attribute('message')).first
+          failure_message = failure.attribute('message')
+          failing_step = failure_info.split('Failing step:').last.split('...').first.strip
+        end
         # Removing scenario outline added blob gives you the actual scenario name
         scenario.name = testcase['name'].split('-- @').first.strip
         scenario.tags, scenario.line = @feature_parser.tags_and_line_number_matching(feature_uri, scenario.name)
@@ -88,7 +96,7 @@ module CucumberJunitToJson
         scenario.uri = feature_uri
         scenario.id = @scenario_id
         scenario_output = get_string_between(testcase.at_css('system-out').text, '@scenario.begin', '@scenario.end')
-        scenario.steps = CucumberJunitToJson::Models::Step.get_steps_for(scenario.name, scenario_output, feature_uri)
+        scenario.steps = CucumberJunitToJson::Models::Step.get_steps_for(scenario.name, scenario_output, feature_uri, failing_step, failure_message)
         scenarios.push(scenario)
         @scenario_id += 1
       end

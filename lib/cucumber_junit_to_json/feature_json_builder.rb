@@ -32,6 +32,9 @@ module CucumberJunitToJson
             json.result do
               json.status step.result.status
               json.duration step.result.duration
+              if step.result.error_message
+                json.error_message step.result.error_message
+              end
             end
             unless step.table.headings.size.zero?
               json.table do

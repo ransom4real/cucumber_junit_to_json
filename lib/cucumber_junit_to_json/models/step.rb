@@ -15,7 +15,7 @@ module CucumberJunitToJson
         @table = CucumberJunitToJson::Models::Table.new
       end
 
-      def self.get_steps_for(scenario_title, scenario_str, feature_file_path)
+      def self.get_steps_for(scenario_title, scenario_str, feature_file_path, failing_step = nil, failure_message = nil)
         steps = []
         table = []
         prev_step_has_table = false
@@ -39,6 +39,9 @@ module CucumberJunitToJson
             result_duration_str = scenario_step.split('...').last
             status, duration = result_duration_str.split('in')
             step.result = CucumberJunitToJson::Models::Result.new(status, duration)
+            if failing_step && failing_step == "#{step.keyword} #{step.name}"
+              step.result.error_message = failure_message
+            end
             step.line = get_scenario_step_matching(scenario_title, feature_file_path, scenario_step.split('...').first.strip).last
             steps.push(step)
           elsif scenario_step.start_with?('|')

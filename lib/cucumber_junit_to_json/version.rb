@@ -2,5 +2,5 @@
 
 # Cucumber Junit to Json version module
 module CucumberJunitToJson
-  VERSION = '0.1.3'
+  VERSION = '0.1.4'
 end
