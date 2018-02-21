@@ -4,13 +4,14 @@ require 'similar_text'
 require_relative 'table'
 require_relative 'match'
 require_relative 'result'
+require_relative 'rows'
 # Top level module
 module CucumberJunitToJson
   # module for all models
   module Models
     # Abstract representation of a cucumber step attribute
     class Step
-      attr_accessor :keyword, :name, :match, :table, :result, :line
+      attr_accessor :keyword, :name, :match, :table, :rows, :result, :line
       def initialize
         @table = CucumberJunitToJson::Models::Table.new
       end
@@ -30,6 +31,12 @@ module CucumberJunitToJson
             # process that table
             if prev_step_has_table == true
               steps.last.table = CucumberJunitToJson::Models::Table.parse(table)
+              rows = []
+              rows.push(steps.last.table.headings)
+              steps.last.table.rows.each do |r|
+                rows.push(r)
+              end
+              steps.last.rows = CucumberJunitToJson::Models::Rows.parse(rows)
               prev_step_has_table = false
               table = []
             end
@@ -54,6 +61,12 @@ module CucumberJunitToJson
         # process it, hence lets do it before we exit this method
         if prev_step_has_table == true
           steps.last.table = CucumberJunitToJson::Models::Table.parse(table)
+          rows = []
+          rows.push(steps.last.table.headings)
+          steps.last.table.rows.each do |r|
+            rows.push(r)
+          end
+          steps.last.rows = CucumberJunitToJson::Models::Rows.parse(rows)
           prev_step_has_table = false
           table = []
         end

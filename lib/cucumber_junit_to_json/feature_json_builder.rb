@@ -41,6 +41,10 @@ module CucumberJunitToJson
                 json.headings step.table.headings
                 json.rows step.table.rows
               end
+              json.rows step.rows do |row|
+                json.cells row.cells
+                json.line row.line
+              end
             end
             json.line step.line
           end

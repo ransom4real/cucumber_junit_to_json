@@ -14,7 +14,7 @@ Performance/RegexpMatch:
 Metrics/PerceivedComplexity:
   Max: 20
 MethodLength:
-  Max: 50
+  Max: 60
 Metrics/ParameterLists:
   Max: 10
 Metrics/AbcSize:
