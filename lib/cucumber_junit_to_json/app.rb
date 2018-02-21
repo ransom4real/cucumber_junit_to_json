@@ -35,7 +35,6 @@ module CucumberJunitToJson
       @feature_parser = CucumberJunitToJson::Parsers::FeatureParser.new(options.feature_dir)
       output_file = options.output_file || 'cucumber.json'
       features = []
-      puts output_file
       unless File.file?(output_file)
         output_directory = File.dirname(output_file)
         FileUtils.mkdir_p(output_directory) unless File.directory?(output_directory)
@@ -82,8 +81,8 @@ module CucumberJunitToJson
         scenario = CucumberJunitToJson::Models::Scenario.new
         # Removing scenario outline added blob gives you the actual scenario name
         scenario.name = testcase['name'].split('-- @').first.strip
-        scenario.tags, scenario.line = @feature_parser.tags_and_line_number_matching(feature_uri, scenario.name, true)
-        scenario_line_text = @feature_parser.text_and_line_number_matching(feature_uri, scenario.name, true).first
+        scenario.tags, scenario.line = @feature_parser.tags_and_line_number_matching(feature_uri, scenario.name)
+        scenario_line_text = @feature_parser.text_and_line_number_matching(feature_uri, scenario.name).first
         scenario.keyword = scenario_line_text.split(':').first.strip
         scenario.type = 'scenario'
         scenario.uri = feature_uri

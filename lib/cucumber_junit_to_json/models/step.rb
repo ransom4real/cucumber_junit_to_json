@@ -68,7 +68,7 @@ module CucumberJunitToJson
             if line =~ /<\S+>/
               # A match percentage greater than 80 is an indication
               # of a good match for scenarios
-              found_scenario = true if line.similar(scenario) >= 80
+              found_scenario = true if line.similar(scenario) >= 76
             elsif line =~ /#{scenario}/
               found_scenario = true
             end
