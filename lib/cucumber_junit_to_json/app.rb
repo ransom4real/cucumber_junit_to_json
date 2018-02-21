@@ -140,7 +140,7 @@ module CucumberJunitToJson
       end
 
       parser.parse!(args)
-      raise Error, parser.banner unless options.junit_dir || options.feature_dir
+      raise Error, parser.banner unless options.junit_dir && options.feature_dir
       options
     end
   end
