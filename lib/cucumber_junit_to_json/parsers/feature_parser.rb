@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'similar_text'
 require_relative '../models/tag'
 # Top level module
 module CucumberJunitToJson
@@ -16,8 +17,8 @@ module CucumberJunitToJson
         @path_to_features = path_to_features
       end
 
-      def tags_and_line_number_matching(file, text)
-        tags, line = text_and_line_number_before_match(file, text)
+      def tags_and_line_number_matching(file, text, partial_match = false)
+        tags, line = text_and_line_number_before_match(file, text, partial_match)
         tag_objects = []
         tags.split(' ').each do |tag|
           if tag.strip.start_with?('@')
@@ -27,26 +28,36 @@ module CucumberJunitToJson
         [tag_objects, line]
       end
 
-      def text_and_line_number_before_match(file, text)
+      def text_and_line_number_before_match(file, text, partial_match = false)
         count = 0
         prev_line_text = ''
         File.open(file, 'r') do |f|
           f.each_line do |line|
             count += 1
-            return prev_line_text, count if line =~ /#{text}/
+            if partial_match == true
+              return prev_line_text, count if line.similar(text) >= 80
+            elsif line =~ /#{text}/
+              return prev_line_text, count
+            end
             prev_line_text = line
           end
         end
+        raise Error, "Could not find #{text} in #{file}"
       end
 
-      def text_and_line_number_matching(file, text)
+      def text_and_line_number_matching(file, text, partial_match = false)
         count = 0
         File.open(file, 'r') do |f|
           f.each_line do |line|
             count += 1
-            return line, count if line =~ /#{text}/
+            if partial_match == true
+              return line, count if line.similar(text) >= 80
+            elsif line =~ /#{text}/
+              return line, count
+            end
           end
         end
+        raise Error, "Could not find #{text} in #{file}"
       end
     end
   end

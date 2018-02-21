@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'jbuilder', '~> 2.7'
   spec.add_runtime_dependency 'json', '~> 2.1'
   spec.add_runtime_dependency 'nokogiri', '~> 1.8'
+  spec.add_runtime_dependency 'similar_text', '~> 0.0.4'
 end

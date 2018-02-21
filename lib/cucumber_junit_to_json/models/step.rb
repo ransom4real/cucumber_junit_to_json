@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'similar_text'
 require_relative 'table'
 require_relative 'match'
 require_relative 'result'
@@ -38,7 +39,7 @@ module CucumberJunitToJson
             result_duration_str = scenario_step.split('...').last
             status, duration = result_duration_str.split('in')
             step.result = CucumberJunitToJson::Models::Result.new(status, duration)
-            step.line = get_scenario_step_matching(scenario_title, feature_file_path, step.name).last
+            step.line = get_scenario_step_matching(scenario_title, feature_file_path, scenario_step.split('...').first.strip).last
             steps.push(step)
           elsif scenario_step.start_with?('|')
             prev_step_has_table = true
@@ -62,12 +63,29 @@ module CucumberJunitToJson
         File.open(file, 'r') do |f|
           f.each_line do |line|
             count += 1
-            found_scenario = true if line =~ /#{scenario}/
+            # Check if we got a match anchor in line.
+            # If there is, use a similar matcher
+            if line =~ /<\S+>/
+              # A match percentage greater than 80 is an indication
+              # of a good match for scenarios
+              found_scenario = true if line.similar(scenario) >= 80
+            elsif line =~ /#{scenario}/
+              found_scenario = true
+            end
             if found_scenario
-              return line, count if line =~ /#{step}/
+              # Check if we got a match anchor in line.
+              # If there is, use a similar matcher
+              if line =~ /<\S+>/
+                # A match percentage greater than 76 is an indication
+                # of a good match for steps
+                return line, count if line.similar(step) >= 76
+              elsif line =~ /#{step}/
+                return line, count
+              end
             end
           end
         end
+        raise Error, "Could not find step '#{step}' in '#{scenario}' looking into #{file}"
       end
     end
   end

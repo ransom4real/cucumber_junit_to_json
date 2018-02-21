@@ -34,13 +34,14 @@ module CucumberJunitToJson
       options = parse_args(args)
       @junit_parser = CucumberJunitToJson::Parsers::JunitParser.new(options.junit_dir)
       @feature_parser = CucumberJunitToJson::Parsers::FeatureParser.new(options.feature_dir)
-      output_file = options.target_path
+      output_file = options.output_file || 'cucumber.json'
       features = []
-
+      puts output_file
       unless File.file?(output_file)
-        output_directory = File.dirname(@target_path)
-        FileUtils.mkdir_p(output_directory) if output_directory
-        FileUtils.touch(output_path)
+        output_directory = File.dirname(output_file)
+        FileUtils.mkdir_p(output_directory) unless File.directory?(output_directory)
+        FileUtils.touch(output_file)
+        raise Error, "Could not create output file #{output_file}" unless File.file?(output_file)
       end
       # if we are dealing with a directory of xml files
       if File.directory?(junit_parser.path_to_junit)
@@ -80,9 +81,10 @@ module CucumberJunitToJson
       scenarios = []
       testcases.each do |testcase|
         scenario = CucumberJunitToJson::Models::Scenario.new
-        scenario.name = testcase['name']
-        scenario.tags, scenario.line = @feature_parser.tags_and_line_number_matching(feature_uri, scenario.name)
-        scenario_line_text = @feature_parser.text_and_line_number_matching(feature_uri, scenario.name).first
+        # Removing scenario outline added blob gives you the actual scenario name
+        scenario.name = testcase['name'].split('-- @').first.strip
+        scenario.tags, scenario.line = @feature_parser.tags_and_line_number_matching(feature_uri, scenario.name, true)
+        scenario_line_text = @feature_parser.text_and_line_number_matching(feature_uri, scenario.name, true).first
         scenario.keyword = scenario_line_text.split(':').first.strip
         scenario.type = 'scenario'
         scenario.uri = feature_uri
@@ -107,7 +109,7 @@ module CucumberJunitToJson
       options = OpenStruct.new
       options.junit_dir = nil
       options.feature_dir = nil
-      options.target_path = 'cucumber.json'
+      options.output_file = nil
       parser = OptionParser.new do |p|
         p.banner = "USAGE: #{$PROGRAM_NAME} --junit-dir JUNITDIR --feature-dir FEATUREDIR"
         p.separator ''
@@ -121,8 +123,8 @@ module CucumberJunitToJson
           options.feature_dir = feature_dir
         end
 
-        p.on '-o', '--output [OUTPUT]', 'Provide a path to output json file.' do |output_file_path|
-          options.output_file = output_file_path || 'cucumber.json'
+        p.on '-o', '--output [OUTPUT]', 'Provide a path to output json file.' do |output|
+          options.output_file = output
         end
 
         p.on_tail('-h', '--help', 'Show this message') do
