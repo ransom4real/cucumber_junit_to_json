@@ -11,6 +11,7 @@ module CucumberJunitToJson
   module Models
     # Abstract representation of a cucumber step attribute
     class Step
+      Error = Class.new(RuntimeError)
       attr_accessor :keyword, :name, :match, :table, :rows, :result, :line
       def initialize
         @table = CucumberJunitToJson::Models::Table.new
@@ -94,7 +95,7 @@ module CucumberJunitToJson
               if line =~ /<\S+>/
                 # A match percentage greater than 76 is an indication
                 # of a good match for steps
-                return line, count if line.similar(step) >= 76
+                return line, count if line.similar(step) >= 67
               elsif line =~ /#{step}/
                 return line, count
               end
