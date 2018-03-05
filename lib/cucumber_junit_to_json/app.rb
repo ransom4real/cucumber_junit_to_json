@@ -83,6 +83,8 @@ module CucumberJunitToJson
         failure_message = nil
         if testcase['status'] == 'failed'
           failure = testcase.css('failure')
+          # Sometimes <failure> node come as <error>
+          failure ||= testcase.css('error')
           failure_info = failure.text.split(failure.attribute('message')).first
           failure_message = failure.attribute('message')
           failing_step = failure_info.split('Failing step:').last.split('...').first.strip
