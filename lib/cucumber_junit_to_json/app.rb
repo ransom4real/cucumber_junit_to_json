@@ -92,8 +92,10 @@ module CucumberJunitToJson
           end
         end
         # Removing scenario outline added blob gives you the actual scenario name
+        use_similar_matcher = false
+        use_similar_matcher = true if testcase['name'].include?('-- @')
         scenario.name = testcase['name'].split('-- @').first.strip
-        scenario.tags, scenario.line = @feature_parser.tags_and_line_number_matching(feature_uri, scenario.name)
+        scenario.tags, scenario.line = @feature_parser.tags_and_line_number_matching(feature_uri, scenario.name, use_similar_matcher)
         scenario_line_text = @feature_parser.text_and_line_number_matching(feature_uri, scenario.name).first
         scenario.keyword = scenario_line_text.split(':').first.strip
         scenario.type = 'scenario'

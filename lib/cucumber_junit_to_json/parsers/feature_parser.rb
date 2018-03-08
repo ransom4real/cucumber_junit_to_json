@@ -17,8 +17,8 @@ module CucumberJunitToJson
         @path_to_features = path_to_features
       end
 
-      def tags_and_line_number_matching(file, text)
-        tags, line = text_and_line_number_before_match(file, text)
+      def tags_and_line_number_matching(file, text, similar = false)
+        tags, line = text_and_line_number_before_match(file, text, similar)
         tag_objects = []
         tags.split(' ').each do |tag|
           if tag.strip.start_with?('@')
@@ -28,14 +28,14 @@ module CucumberJunitToJson
         [tag_objects, line]
       end
 
-      def text_and_line_number_before_match(file, text)
+      def text_and_line_number_before_match(file, text, similar = false)
         count = 0
         prev_line_text = ''
         File.open(file, 'r') do |f|
           f.each_line do |line|
             count += 1
-            if line =~ /<\S+>/
-              return prev_line_text, count if line.similar(text) >= 76
+            if similar || line =~ /<\S+>/
+              return prev_line_text, count if line.similar(text) >= 73
             elsif line =~ /#{text}/
               return prev_line_text, count
             end
@@ -45,13 +45,13 @@ module CucumberJunitToJson
         raise Error, "Could not find #{text} in #{file}"
       end
 
-      def text_and_line_number_matching(file, text)
+      def text_and_line_number_matching(file, text, similar = false)
         count = 0
         File.open(file, 'r') do |f|
           f.each_line do |line|
             count += 1
-            if line =~ /<\S+>/
-              return line, count if line.similar(text) >= 76
+            if similar || line =~ /<\S+>/
+              return line, count if line.similar(text) >= 73
             elsif line =~ /#{text}/
               return line, count
             end
