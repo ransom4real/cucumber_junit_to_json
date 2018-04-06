@@ -92,7 +92,7 @@ module CucumberJunitToJson
               failure_message = failure.attribute('message')
               failing_step = failure_info.split('Failing step:').last.split('...').first.strip
             rescue StandardError => e
-              puts "Error with failure node #{failure}\n#{e.message}\n"
+              puts "Rescuing Error with failure node #{failure}\n#{e.message}\n"
             end
           end
         end

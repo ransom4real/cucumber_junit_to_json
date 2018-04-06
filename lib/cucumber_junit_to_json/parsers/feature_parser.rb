@@ -34,7 +34,7 @@ module CucumberJunitToJson
         File.open(file, 'r') do |f|
           f.each_line do |line|
             count += 1
-            if similar || line =~ /<\S+>/
+            if similar && line =~ /<\S+>/
               return prev_line_text, count if line.similar(text) >= 73
             elsif line =~ /#{text}/
               return prev_line_text, count
